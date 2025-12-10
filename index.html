@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="ky">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Генератор экзамендик билеттер</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Times New Roman', serif;
+            margin: 0;
+            padding: 20px;
+            background: #f5f5f5;
+            font-size: 14px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .input-section {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .input-section h2 {
+            margin-top: 0;
+            color: #333;
+        }
+        .input-section textarea {
+            width: 100%;
+            height: 300px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            padding: 15px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            resize: vertical;
+        }
+        .input-section textarea:focus {
+            outline: none;
+            border-color: #2563eb;
+        }
+        .buttons {
+            margin-top: 15px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .btn {
+            padding: 12px 24px;
+            font-size: 16px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn-primary {
+            background: #2563eb;
+            color: white;
+        }
+        .btn-primary:hover {
+            background: #1d4ed8;
+        }
+        .btn-success {
+            background: #16a34a;
+            color: white;
+        }
+        .btn-success:hover {
+            background: #15803d;
+        }
+        .btn-secondary {
+            background: #6b7280;
+            color: white;
+        }
+        .btn-secondary:hover {
+            background: #4b5563;
+        }
+        .output-section {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        .ticket {
+            background: white;
+            border: 2px solid #000;
+            padding: 25px 30px;
+            margin-bottom: 30px;
+            page-break-after: always;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 10px;
+        }
+        .university {
+            font-size: 14px;
+            margin-bottom: 3px;
+        }
+        .college {
+            font-size: 14px;
+            border-bottom: 1px solid #000;
+            padding-bottom: 8px;
+            margin-bottom: 5px;
+            text-align: center;
+        }
+        .discipline {
+            text-align: center;
+            margin: 10px 0 15px 0;
+        }
+        .question {
+            margin: 15px 0;
+            line-height: 1.5;
+        }
+        .question-ru {
+            margin-bottom: 3px;
+        }
+        .question-kg {
+            font-weight: bold;
+            margin-left: 20px;
+        }
+        .points {
+            float: right;
+        }
+        .footer {
+            margin-top: 25px;
+            padding-top: 10px;
+            display: flex;
+            justify-content: space-between;
+        }
+        .signature {
+            text-align: right;
+            margin-top: 15px;
+        }
+        .clearfix::after {
+            content: "";
+            display: table;
+            clear: both;
+        }
+        .no-tickets {
+            text-align: center;
+            padding: 50px;
+            color: #666;
+            font-size: 18px;
+        }
+        .instructions {
+            background: #fef3c7;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 15px;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+        .instructions code {
+            background: #fde68a;
+            padding: 2px 5px;
+            border-radius: 3px;
+        }
+        @media print {
+            body {
+                background: white;
+                margin: 0;
+                padding: 10px;
+            }
+            .input-section, .buttons, .no-tickets, .instructions {
+                display: none !important;
+            }
+            .container {
+                max-width: 100%;
+            }
+            .output-section {
+                max-width: 100%;
+            }
+            .ticket {
+                page-break-after: always;
+                border: 2px solid #000 !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="input-section">
+        <h2>📝 Генератор экзаменационных билетов</h2>
+        
+        <div class="instructions">
+            <strong>Инструкция:</strong> Вставьте текст билетов в формате ASCII (с рамками <code>+---+</code>). 
+            Каждый билет должен содержать вопросы с номерами (1., 2., 3.) и переводы после <code>---</code>.
+            После вставки нажмите "Генерировать билеты".
+        </div>
+        
+        <textarea id="inputText" placeholder="Вставьте текст билетов сюда...
+
+Пример формата:
++-----------------------------------------------------------------------+
+| &quot;Муса Рыскулбеков атындагы КЫРГЫЗ ЭКОНОМИКАЛЫК УНИВЕРСИТЕТИ&quot; |
+| ИЛИМИЙ ИЗИЛДӨӨ УНИВЕРСИТЕТИ |
+| ЭКОНОМИКА жана СЕРВИС КОЛЛЕДЖИ |
++=======================================================================+
+| &quot;Этика жана психология&quot; дисциплинасы боюнча экзамендик билет №1 |
+| |
+| 1. Вопрос на русском языке. (8 балл) |
+| --- Перевод на кыргызском. |
+| |
+| 2. Второй вопрос. (8 балл) |
+| --- Перевод второго вопроса. |
+| |
+| 3. Третий вопрос. (14 балл) |
+| --- Перевод третьего вопроса. |
+| |
+| 2025-ж. «____» декабры ОУК төрайымы Таалайбек к. С.___________ |
+| Окутуучу Кенжебаев А.К.___________ |
++-----------------------------------------------------------------------+"></textarea>
+        
+        <div class="buttons">
+            <button class="btn btn-primary" onclick="generateTickets()">🎫 Генерировать билеты</button>
+            <button class="btn btn-success" onclick="exportToPDF()">📄 Экспорт в PDF</button>
+            <button class="btn btn-secondary" onclick="clearAll()">🗑️ Очистить</button>
+        </div>
+    </div>
+    
+    <div class="output-section" id="output">
+        <div class="no-tickets">Вставьте текст и нажмите "Генерировать билеты"</div>
+    </div>
+</div>
+
+<script>
+function parseTickets(text) {
+    const tickets = [];
+    
+    // Разбиваем на отдельные билеты по разделителям
+    const ticketBlocks = text.split(/\+[-=]+\+/).filter(block => block.trim());
+    
+    let currentTicket = null;
+    
+    for (let block of ticketBlocks) {
+        // Убираем символы рамок
+        let lines = block.split('\n')
+            .map(line => line.replace(/^\||\|$/g, '').trim())
+            .filter(line => line);
+        
+        // Проверяем, есть ли номер билета
+        const ticketMatch = lines.join(' ').match(/билет\s*№?\s*(\d+)/i);
+        
+        if (ticketMatch) {
+            if (currentTicket) {
+                tickets.push(currentTicket);
+            }
+            
+            currentTicket = {
+                number: ticketMatch[1],
+                questions: [],
+                date: '',
+                ouk: '',
+                teacher: ''
+            };
+            
+            // Парсим вопросы
+            let fullText = lines.join('\n');
+            
+            // Находим вопросы
+            const questionRegex = /(\d+)\.\s*([^]*?)(?=\d+\.|2025-ж|$)/g;
+            let match;
+            
+            while ((match = questionRegex.exec(fullText)) !== null) {
+                let questionText = match[2].trim();
+                
+                // Разделяем на русский и кыргызский
+                let parts = questionText.split(/\n\s*---\s*/);
+                let ruText = parts[0] || '';
+                let kgText = parts[1] || '';
+                
+                // Очищаем текст
+                ruText = ruText.replace(/\s+/g, ' ').trim();
+                kgText = kgText.replace(/\s+/g, ' ').trim();
+                
+                // Извлекаем баллы
+                const pointsMatch = ruText.match(/\((\d+)\s*балл?\)/i);
+                const points = pointsMatch ? pointsMatch[1] : '';
+                
+                // Убираем баллы из kgText если они там
+                kgText = kgText.replace(/\(\d+\s*балл?\)/gi, '').trim();
+                
+                if (ruText) {
+                    currentTicket.questions.push({
+                        number: match[1],
+                        ru: ruText,
+                        kg: kgText,
+                        points: points
+                    });
+                }
+            }
+            
+            // Ищем дату и подписи
+            if (fullText.includes('2025-ж')) {
+                currentTicket.date = '2025-ж. «____» декабры';
+            }
+            if (fullText.includes('Таалайбек')) {
+                currentTicket.ouk = 'ОУК төрайымы Таалайбек к. С.___________';
+            }
+            if (fullText.includes('Кенжебаев')) {
+                currentTicket.teacher = 'Окутуучу Кенжебаев А.К.___________';
+            }
+        }
+    }
+    
+    if (currentTicket) {
+        tickets.push(currentTicket);
+    }
+    
+    return tickets;
+}
+
+function generateTicketHTML(ticket) {
+    let questionsHTML = '';
+    
+    for (let q of ticket.questions) {
+        questionsHTML += `
+        <div class="question clearfix">
+            <div class="question-ru">${q.number}. ${q.ru}</div>
+            ${q.kg ? `<div class="question-kg">${q.kg}</div>` : ''}
+        </div>`;
+    }
+    
+    return `
+    <div class="ticket">
+        <div class="header">
+            <div class="university">"Муса Рыскулбеков атындагы КЫРГЫЗ ЭКОНОМИКАЛЫК УНИВЕРСИТЕТИ"</div>
+            <div class="university">ИЛИМИЙ ИЗИЛДӨӨ УНИВЕРСИТЕТИ</div>
+        </div>
+        <div class="college">ЭКОНОМИКА жана СЕРВИС КОЛЛЕДЖИ</div>
+        <div class="discipline">"Этика жана психология" дисциплинасы боюнча экзамендик билет №${ticket.number}</div>
+        
+        ${questionsHTML}
+        
+        <div class="footer">
+            <div>${ticket.date || '2025-ж. «____» декабры'}</div>
+            <div>${ticket.ouk || 'ОУК төрайымы Таалайбек к. С.___________'}</div>
+        </div>
+        <div class="signature">${ticket.teacher || 'Окутуучу Кенжебаев А.К.___________'}</div>
+    </div>`;
+}
+
+function generateTickets() {
+    const inputText = document.getElementById('inputText').value;
+    const output = document.getElementById('output');
+    
+    if (!inputText.trim()) {
+        output.innerHTML = '<div class="no-tickets">⚠️ Пожалуйста, вставьте текст билетов</div>';
+        return;
+    }
+    
+    const tickets = parseTickets(inputText);
+    
+    if (tickets.length === 0) {
+        output.innerHTML = '<div class="no-tickets">⚠️ Не удалось распознать билеты. Проверьте формат текста.</div>';
+        return;
+    }
+    
+    let html = '';
+    for (let ticket of tickets) {
+        html += generateTicketHTML(ticket);
+    }
+    
+    output.innerHTML = html;
+}
+
+function exportToPDF() {
+    const output = document.getElementById('output');
+    if (output.querySelector('.no-tickets')) {
+        alert('Сначала сгенерируйте билеты!');
+        return;
+    }
+    window.print();
+}
+
+function clearAll() {
+    document.getElementById('inputText').value = '';
+    document.getElementById('output').innerHTML = '<div class="no-tickets">Вставьте текст и нажмите "Генерировать билеты"</div>';
+}
+</script>
+
+</body>
+</html>
